@@ -1,0 +1,367 @@
+import random
+import time
+import os
+import winsound
+
+# === KRİTİK HATA YAKALAMA ÇEVRESİ ===
+try:
+    os.system('') 
+except Exception as e:
+    pass 
+    
+# === RENKLER ===
+GREEN = "\033[92m"
+CYAN = GREEN 
+YELLOW = GREEN
+RED = GREEN  
+BLUE = GREEN 
+RESET = "\033[0m"
+DEFAULT_COLOR = GREEN 
+
+# === SES YOLU KONTROLÜ ===
+# Kullanıcının verdiği tam yolu kullanıyoruz.
+SOUND_PATH = r"C:\Users\enfan\OneDrive\Masaüstü\matrix_oyunu"
+
+def play_sound(filename):
+    """Belirtilen ses dosyasını güvenli bir şekilde oynatır."""
+    path = os.path.join(SOUND_PATH, filename)
+    
+    try:
+        winsound.PlaySound(path, winsound.SND_FILENAME | winsound.SND_ASYNC)
+    except Exception as e:
+        print(f"\n{GREEN}[!] Ses çalınamadı: {filename}. Ses Yolu Kontrol Edildi: {path}. Hata: {e}{RESET}")
+
+# (matrix_rain ve slow_print fonksiyonları önceki haliyle kalır)
+def matrix_rain(duration=5):
+    # ... (matrix_rain fonksiyonu)
+    try:
+        cols, rows = os.get_terminal_size().columns, os.get_terminal_size().lines
+    except:
+        cols, rows = 80, 24
+        
+    drops = [random.randint(0, rows) for _ in range(cols)]
+    start = time.time()
+    
+    print("\033[H\033[J", end="") 
+
+    while time.time() - start < duration:
+        out = []
+        for r in range(rows):
+            line_chars = []
+            for c in range(cols):
+                if drops[c] == r:
+                    line_chars.append(random.choice("01"))
+                else:
+                    line_chars.append(" ")
+            out.append(GREEN + "".join(line_chars) + RESET)
+            
+        print("\033[H", end="") 
+        print("\n".join(out))
+        
+        drops = [(d + 1) % rows for d in drops]
+        time.sleep(0.05)
+    
+    print("\033[H\033[J", end="") 
+
+def slow_print(text, delay=0.03, color=DEFAULT_COLOR, rabbit_code=False):
+    # ... (slow_print fonksiyonu)
+    try:
+        delay = float(delay)
+    except:
+        delay = 0.03
+    
+    rabbit_symbol = f"{GREEN}🐰{RESET}"
+    rabbit_text = "R4bb1t_H0l3" 
+    
+    if rabbit_code and random.random() < 0.08: 
+        split_point = random.randint(len(text) // 4, len(text) * 3 // 4)
+        for ch in str(text)[:split_point]:
+            print(f"{color}{ch}{RESET}", end='', flush=True)
+            time.sleep(delay)
+            
+        print("\n\n" + rabbit_symbol + f" {GREEN}{rabbit_text}{RESET} " + rabbit_symbol)
+        time.sleep(1.5)
+        print() 
+        print(f"{GREEN}>> {RESET}", end='', flush=True) 
+        
+        for ch in str(text)[split_point:]:
+            print(f"{color}{ch}{RESET}", end='', flush=True)
+            time.sleep(delay)
+    
+    else:
+        for ch in str(text):
+            print(f"{color}{ch}{RESET}", end='', flush=True)
+            time.sleep(delay)
+            
+    print()
+
+
+# ... (introduction_story, escape_sequence, morpheus_meeting fonksiyonları aynı kalır)
+def introduction_story():
+    # ... (implementation remains the same as before)
+    matrix_rain(5)
+    
+    slow_print("Saat 02:47. Klavyede uyuyakaldın. Bilgisayar ekranında yanıp sönen tek kelime: UYAN.", 
+                 delay=0.04, color=GREEN)
+    time.sleep(1.5)
+    
+    slow_print("Ekranda bir mesaj beliriyor: 'Tavşan deliğini takip et.' Kalp atışların hızlanıyor. Birisi seni izliyor...", 
+                 delay=0.04, color=GREEN, rabbit_code=False)
+    time.sleep(2)
+    
+    # Trinity ile Karşılaşma
+    slow_print("Neon ışıkların aydınlattığı bir kulüpte, Trinity seni buluyor. Gözlerinde derin bir bilgi var. 'Merhaba Thomas...' diyor.", 
+                 delay=0.04, color=GREEN)
+    time.sleep(1.5)
+    
+    name = input(f"{GREEN}\n[Sorgu 1] Gerçek adını söyle. Kim olduğunu hatırla: {RESET}")
+    if not name:
+        name = "Thomas Anderson"
+        
+    # Trinity Artık İsimle Hitap Ediyor
+    slow_print(f"Trinity: 'Sana Matrix'in ne olduğunu söyleyemem, {name}. Görmen gerek.' Gizemli bir fısıltı: 'Bir adam, Morpheus. Seni arıyor.'", 
+                 delay=0.05, color=GREEN)
+    play_sound("tavsan.wav")
+    time.sleep(2)
+    
+    slow_print(f"Trinity: '{name}, takip et beni.'", color=GREEN, delay=0.03) 
+    time.sleep(1)
+    
+    return name
+
+def escape_sequence(name):
+    """Trinity'nin yönlendirmesiyle uzun kaçış sahnesi. Yanlış cevap infazla sonlanır."""
+    print("\n" + "="*50)
+    slow_print(f"Kapı çalınıyor. Ajan Smith! Trinity fısıldıyor: 'Koş! İlk kapıdan çık ve benim söylediklerimi yap!'", color=GREEN, delay=0.04)
+    time.sleep(1)
+    
+    slow_print("Morpheus telefonda: 'Korkmuyorsun, değil mi, Neo? Sadece gerçeği görene kadar.'", color=GREEN, delay=0.04)
+    play_sound("hata1.wav")
+    
+    # --- KARAR NOKTASI 1: KAÇIŞ YOLU ---
+    slow_print("\nKoridorun sonunda sol tarafta dar bir merdiven, sağ tarafta ise eski, paslı bir havalandırma girişi var.", color=GREEN, delay=0.05)
+    slow_print(f"Trinity: '{name}, Ajanlar merdivenleri tahmin eder. Risk al!'", color=GREEN, delay=0.04)
+    choice1 = input(f"{GREEN}Hangi yolu seçiyorsun? (merdiven/havalandırma): {RESET}").lower().strip()
+    
+    if choice1 == "merdiven":
+        slow_print("Yanlış seçim! Merdivenler tıkalı. Ajan Smith'in botlarının sesi yaklaşıyor!", color=GREEN, delay=0.05)
+        run_ending(name, "SMITH") # Erken infaz sonu
+        return False
+    else:
+        slow_print("Havalandırmaya süründün. Başardın. Trinity: 'İyi iş. Ama içerisi dar ve karanlık.'", color=GREEN, delay=0.05)
+        play_sound("dogru.wav")
+        time.sleep(0.5)
+
+    # --- KARAR NOKTASI 2: SAKLANMA MI, DEVAM MI? ---
+    slow_print("\nHavalandırma borusunun keskin bir köşesindesin. Dışarıdan Ajanların fısıltıları geliyor. Bir süre burada bekleyebilirsin, ya da ilerlemeye devam edebilirsin.", color=GREEN, delay=0.05)
+    slow_print(f"Morpheus: 'Zamanın yok, {name}. Durmak Matrix'in sana ulaşması demektir!'", color=GREEN, delay=0.04)
+    choice2 = input(f"{GREEN}Ne yapıyorsun? (saklan/ilerle): {RESET}").lower().strip()
+    
+    if choice2 == "saklan":
+        slow_print("Duraksadın. Ajan Smith, metal boruya vurarak yerini tespit etti! Boru patladı!", color=RED, delay=0.05)
+        run_ending(name, "SMITH") # Erken infaz sonu
+        return False
+    else:
+        slow_print("İlerlemeye devam ettin. Hava borusunun sonu, seni bir çamaşırhanenin çatısına fırlatıyor.", color=GREEN, delay=0.05)
+        play_sound("dogru.wav")
+        time.sleep(0.5)
+        
+    # --- KARAR NOKTASI 3: ÇATI ATLAMA SAHNESİ ---
+    slow_print("\nBüyük bir çatının kenarındasın. Karşındaki binaya atlamalısın. Mesafeyi hesaplamak zor.", color=GREEN, delay=0.05)
+    slow_print(f"Trinity: 'Atlamak zorundasın, {name}! Atla!' Sen tereddüt ediyorsun... Ve Ajanlar yaklaşıyor.", color=GREEN, delay=0.04)
+    choice3 = input(f"{GREEN}Atla mı? (e/h): {RESET}").lower().strip()
+    
+    if choice3 == "e":
+        slow_print("Atladın! Kodu kırdın. Düşüş yerine, kendini bir aracın içinde buluyorsun. Kurtuldun!", color=GREEN, delay=0.05)
+        play_sound("dogru.wav")
+        time.sleep(0.5)
+        print("="*50 + "\n")
+        return True # Başarılı kaçış
+    else:
+        slow_print("Tereddüt ettin. Smith arkanda beliriyor. 'Geri dönüyoruz, Anderson...' Kaçış yok.", color=RED, delay=0.05)
+        run_ending(name, "SMITH") # Erken infaz sonu
+        return False
+
+def morpheus_meeting(name):
+    """Morpheus ile ilk tanışma ve hap seçimi sahnesi."""
+    
+    play_sound("giris.wav")
+    
+    slow_print(f"\nArtık araçta değilsin. Etrafında metal, kablolar ve duman var. Burası Nebuchadnezzar.", color=GREEN, delay=0.04)
+    slow_print("Uzun, siyah bir trençkotlu adam sana dönüyor. 'Ben Morpheus. Seçilmiş Kişiyi aradım. Seni buldum.'", color=GREEN, delay=0.05)
+    time.sleep(2)
+    
+    slow_print("Morpheus: 'Bana gerçeğe inanıp inanmayacağını bilmek için buradasın.'", color=GREEN, delay=0.05)
+    time.sleep(1)
+    
+    play_sound("hap.wav")
+    slow_print("\nÖnünde iki hap beliriyor. Morpheus devam ediyor:", color=GREEN, rabbit_code=False)
+    slow_print("🔴 Kırmızı hap → Kal, gerçeği öğren, kodun efendisi ol. (MATRIX'ten Uyanış)", color=GREEN)
+    slow_print("🔵 Mavi hap → Git, uyu, her şey rüya kalsın, acı sona ersin. (Unutuş)", color=BLUE)
+
+
+# === FELSEFİ BİLMECELER (HAVUZ BÜYÜTÜLDÜ) ===
+questions_pool = [
+    # Mevcut Bilmeceler (1-7)
+    {"q": "1️⃣ Bilinçaltının kaçış döngüsünü, yani Matrix'in en zayıf noktasını temsil eden kavram nedir? (Özgür İrade/Duygular)", "a": "duygular"},
+    {"q": "2️⃣ Morpheus'un gemisinin adı, 'Rüyalarındaki tanrılarla buluşanların rüyası' anlamına gelen hangi antik kaynaktan gelir? (Seraph/Nebuchadnezzar)", "a": "nebuchadnezzar"},
+    {"q": "3️⃣ Matrix'i kuran, düzeni ve döngüyü koruyan, 'İnsanların %99.9'u yalanı kabul eder' diyen program kimdir? (Mimar/Oracle)", "a": "mimar"},
+    {"q": "4️⃣ Matrix'teki gerçeklik illüzyonunu korumakla görevli, kodun kişileşmiş hali olan tehditler kimlerdir? (Ajanlar/Botlar)", "a": "ajanlar"},
+    {"q": "5️⃣ Matrix'in 'anne' programı, Zion'daki ilk kehaneti yapan ve Neo'ya kurabiye veren karakter kimdir? (Sati/Oracle)", "a": "oracle"},
+    {"q": "6️⃣ Matrix'in 'gerçek' yılını (yaklaşık olarak) temsil eden ve Morpheus'un sık sık bahsettiği sayı kaçtır? (2199/2099)", "a": "2199"},
+    {"q": "7️⃣ Matrix'te kendisini serbest bırakan kişi tarafından (Cypher) ihanete uğrayan ve yok edilen gemi hangisidir? (Logos/Nebuchadnezzar)", "a": "nebuchadnezzar"},
+    
+    # Yeni Eklenen Bilmeceler (8-15)
+    {"q": "8️⃣ Trinity'nin, Neo'yu kurtarmak için hayatını feda etmesiyle ilgili olan ve 'Kodun Kırılması' anlamına gelen Latince kelime nedir? (Deus Ex Machina/Potentia)", "a": "potentia"},
+    {"q": "9️⃣ Neo'nun ilk başta çalıştığı, sıradan bir hayat sürdüğü ve uyanışının başladığı bilgisayar yazılımı şirketi hangisidir? (MetaCortex/Simulacron)", "a": "metacortex"},
+    {"q": "🔟 Matrix'in içinden çıkan ve gerçekliği reddeden Sürgün programların toplandığı yer neresidir? (Makine Şehri/Merovingian'ın Alanı)", "a": "merovingian'ın alanı"},
+    {"q": "1️⃣1️⃣ Matrix'in tasarımının, insanların isyan etmesini önlemek için bilerek kusurlu bırakılan %1'lik başarısızlık oranı için kullanılan terim nedir? (Anomali/Reboot)", "a": "anomali"},
+    {"q": "1️⃣2️⃣ Neo'nun, Ajan Smith'in mermilerini durdurmayı ve Matrix'i manipüle etmeyi öğrendiği 'Seçilmiş Kişi'ye dönüşüm aşamasına ne ad verilir? (Uyanış/Görme)", "a": "görme"},
+    {"q": "1️⃣3️⃣ Ajan Smith'in, Matrix'ten çıkış yapan bir insanın vücuduna girerek ele geçirmeye çalıştığı ilk kişi kimdir? (Morpheus/Bane)", "a": "bane"},
+    {"q": "1️⃣4️⃣ Matrix'in yedinci ve son versiyonunu tasarlayan ve Matrix'teki 'hata'yı temsil eden iki program nedir? (Keymaker ve Oracle/Mimar ve Oracle)", "a": "mimar ve oracle"},
+    {"q": "1️⃣5️⃣ Matrix'te, 'Ne yiyeceğimi bilmek isterdim' diyerek isyan eden ve Agent Smith ile anlaşma yapan hain kimdir? (Mouse/Cypher)", "a": "cypher"}
+]
+
+
+# === SONLANDIRMA FONKSİYONU ===
+def run_ending(name, ending_type):
+    """Belirtilen sona göre hikayeyi sonlandırır."""
+    print("\n" * 3)
+    
+    if ending_type == "SMITH": 
+        time.sleep(2) 
+        
+        # Hata Sesi ve İnfaz Detayları
+        play_sound("hata1.wav") 
+        
+        slow_print(f"AJAN SMITH: 'Özgür irade illüzyonuna inanmak büyük bir hata, {name}. Kodun temizlenmesi gerekiyor.'", color=RED)
+        slow_print("Kurşunlar vurdu. Gerçeklik parçalandı. Zihninin her satırı silindi. Matrix'teki son anın.", color=RED)
+            
+        slow_print("Artık sen de sistemin bir parçasısın. Yeni bir Ajan doğdu.", color=GREEN)
+        slow_print("\n" * 2)
+        slow_print(f"{RED}--- SON 4: AJAN SMITH İSTİLASI / İNFAZ ---{RESET}", color=RED, delay=0.08)
+        
+    elif ending_type == "KURTULUS": 
+        play_sound("final_kurtulus.wav")
+        slow_print(f"Kod çözüldü! Mimar'ın çaresiz çığlıkları duyuluyor. Zion'a giden kapı açık. {name}, sen Seçilmiş Kişi'sin.", color=GREEN)
+        slow_print("Ajanlar toza dönüştü. Trinity ve Morpheus seni bekliyor. Programın sonuna geldin.", color=GREEN)
+        slow_print("Artık yağmur olarak düşen kodları durdurabilirsin.", color=GREEN)
+        slow_print("\n" * 2)
+        slow_print(f"{GREEN}--- SON 2: ZION'A KURTULUŞ ---{RESET}", color=GREEN, delay=0.08)
+        
+    elif ending_type == "ANLASMA": 
+        play_sound("final_mimar.wav")
+        slow_print(f"Yeterince kod çözdün ama tam değil. Mimar karşına çıkıyor.", color=GREEN)
+        slow_print(f"'{name}, bir uzlaşma yapalım.' Matrix, dengesini korudu. Sen ve sevdiklerin rahatsınız, ama savaş devam edecek...", color=GREEN)
+        slow_print("Sen artık 'Anlaşmacı'sın. Dengeyi koruyan kişi. Ne tutsak, ne tam özgür.", color=GREEN)
+        slow_print("\n" * 2)
+        slow_print(f"{GREEN}--- SON 3: MİMAR İLE ANLAŞMA ---{RESET}", color=GREEN, delay=0.08)
+    
+    elif ending_type == "UYKUCU":
+        play_sound("final_uyku.wav")
+        print("\n" * 2)
+        slow_print("Gözlerin ağırlaşıyor... Terminaldeki kodlar bulanıklaşıyor...", color=GREEN)
+        slow_print(f"Matrix seni nazikçe yatağına geri yatırıyor. {name} yoktu, Thomas Anderson vardı.", color=GREEN)
+        slow_print("Bu rüyayı hatırlamayacaksın. Alarmın çalacak ve işe gideceksin. Her şey yolunda...", color=GREEN)
+        slow_print("\n" * 2)
+        slow_print(f"{GREEN}--- SON 1: UYKU VE UNUTUŞ ---{RESET}", color=GREEN, delay=0.08)
+    
+    slow_print("\nOyun bitti.", color=GREEN)
+
+
+# === ANA OYUN (GÜNCELLEME BURADA) ===
+def main():
+    
+    try:
+        name = introduction_story()
+    except Exception as e:
+        print(f"{GREEN}\nKRİTİK HATA! Giriş sırasında beklenmedik hata: {e}{RESET}")
+        return
+
+    # Kovalama sahnesi çalışır, başarısız olursa oyun run_ending içinde biter ve False döner.
+    if not escape_sequence(name):
+        return 
+
+    morpheus_meeting(name)
+    
+    choice = input(f"{GREEN}Seçimin ne? (k/m): {RESET}").lower().strip()
+
+    if choice == "m":
+        run_ending(name, "UYKUCU")
+        return
+    else:
+        slow_print("Kırmızı hap yutuldu... Vücudun titriyor. Gerçeklik parçalanıyor.", color=GREEN)
+        play_sound("tavsan.wav") 
+        slow_print(f"\n**[MESAJ: Kodlar seni kabul etti. Şimdi gerçek Matrix'i görme zamanı.]**{RESET}", color=GREEN, delay=0.05)
+        time.sleep(2)
+
+    # === SORULAR VE HATA KONTROLÜ ===
+    score = 0
+    error_count = 0 
+    
+    # *** RANDOM.SAMPLE İLE RASTGELE 5 SORU SEÇİLİYOR ***
+    try:
+        # questions_pool havuzundan rastgele 5 bilmece seç
+        selected_questions = random.sample(questions_pool, 5) 
+    except ValueError as e:
+        # Eğer havuzda yeterli soru yoksa (ki 15 tane var, ama yine de hata yakalama eklendi)
+        print(f"{RED}HATA: Bilmece havuzu yeterli değil. Lütfen en az 5 bilmece olduğundan emin olun. Hata: {e}{RESET}")
+        return
+
+    # Döngü artık sadece seçilen 5 soru üzerinde çalışacak
+    for i, q in enumerate(selected_questions, 1):
+        
+        if error_count >= 3:
+            time.sleep(1) 
+            slow_print(f"\n{RED}KRİTİK HATA: {error_count} yanlış cevap! Ajanlar seni yakaladı ve sisteme entegre ediyor...{RESET}", color=RED)
+            run_ending(name, "SMITH")
+            return 
+            
+        print("\n" + "="*30)
+        
+        play_sound("bilmece.wav") # Bilmece sesi çalınır
+        
+        # Soru numarası, seçilen 5 soru için 1, 2, 3, 4, 5 olarak gösterilir.
+        # Bilmecenin orijinal numarası gösterilmek istenirse q["q"] içindeki numarayı manuel olarak silip sadece metin kalmalı.
+        slow_print(q["q"], color=GREEN, rabbit_code=False) 
+        ans = input(f"{GREEN}Cevabın: {RESET}").lower().strip()
+        
+        if ans == q["a"]:
+            play_sound("dogru.wav")
+            time.sleep(0.5) 
+            slow_print("Doğru... Bir kod daha çözüldü. Matrix'teki etkinliğin artıyor.", color=GREEN)
+            score += 1
+        else:
+            error_count += 1
+            sound_index = min(error_count, 3) 
+            play_sound(f"hata{sound_index}.wav")
+            
+            if error_count == 3:
+                 time.sleep(1.5) 
+                 
+            slow_print("Yanlış! Sistem seni fark etti. Ajanlar sana yaklaşıyor.", color=GREEN)
+            time.sleep(1)
+
+    # === SONLAR (Skor, toplam 5 soru üzerinden hesaplanır) ===
+    
+    if error_count >= 3:
+        run_ending(name, "SMITH")
+    # Skor 5'e eşitse (tümünü doğru bildiyse)
+    elif score == 5: 
+        run_ending(name, "KURTULUS")
+    # Skor 3 veya 4 ise (çoğunu doğru bildiyse)
+    elif 3 <= score < 5: 
+        run_ending(name, "ANLASMA")
+    # Skor 0, 1 veya 2 ise (başarısız sayılırsa)
+    else: 
+        run_ending(name, "SMITH")
+        
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print(f"\n{RED}GENEL KRİTİK HATA! Kod beklenmedik bir şekilde durdu. Hata mesajı: {e}{RESET}")
+    finally:
+        # Hata olsa da olmasa da terminalin kapanmasını engelle
+        input(f"\n{GREEN}Oyun bitti. Kapatmak için ENTER tuşuna basınız...{RESET}")
